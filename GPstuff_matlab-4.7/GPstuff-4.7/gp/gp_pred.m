@@ -1,4 +1,4 @@
-function [Eft, Varft, lpyt, Eyt, Varyt] = gp_pred(gp, x, y, varargin)
+function [Eft, Varft, lpyt, Eyt, Varyt, Covyt] = gp_pred(gp, x, y, varargin)
 %GP_PRED  Make predictions with Gaussian process 
 %
 %  Description
@@ -172,6 +172,8 @@ if iscell(gp) || numel(gp.jitterSigma2)>1 || isfield(gp,'latent_method')
       [Eft, Varft, lpyt, Eyt] = fh_pred(gp, x, y, varargin{:});
     case 5
       [Eft, Varft, lpyt, Eyt, Varyt] = fh_pred(gp, x, y, varargin{:});
+      case 6
+          [Eft, Varft, lpyt, Eyt, Varyt, Covyt] = fh_pred(gp, x, y, varargin{:});
   end
   return
 end
@@ -290,12 +292,14 @@ switch gp.type
             V = gp_trvar(rmfield(gp,'derivobs'),xt((i1-1)*nblock+1:min(i1*nblock,nxt),:),predcf);
           else
             V = gp_trvar(gp,xt((i1-1)*nblock+1:min(i1*nblock,nxt),:),predcf);
+            cov = gp_trcov(gp,xt((i1-1)*nblock+1:min(i1*nblock,nxt),:),predcf);
           end
           if issparse(C)
             Varft(xtind2) = V - diag(K'*ldlsolve(LD,K));
           else
             v = L\K;
             Varft(xtind2) = V - sum(v'.*v',2);
+            Covft = cov - v' * v;
           end
           
           % If there are specified mean functions
@@ -370,8 +374,10 @@ switch gp.type
       if ~strcmp(gp.lik.type, 'Gaussian-smt') 
         % normal case
         [V, Cv] = gp_trvar(gp,xt,predcf);
+        [Cov, Covn] = gp_trcov(gp,xt,predcf);
         Eyt = Eft;
         Varyt = Varft + Cv - V;
+        Covyt = Covft + Covn - Cov;
         if ~isempty(yt)
           lpyt = norm_lpdf(yt, Eyt, sqrt(Varyt));
         end
@@ -1050,5 +1056,3 @@ switch gp.type
       end
     end
 end
-
-

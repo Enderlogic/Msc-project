@@ -14,10 +14,10 @@ random_seed = 'on'; % choose random seed for data, if seed is 'on', the data wil
 
 ratio_train = 0.6; % set the ratio of training set among the whole set
 
-model_cov = {'SE'}; %choose the kernel of model ('SE'; 'Periodic'; 'Matern', 1; 'Matern', 2)
+model_cov = {'Matern', 2}; %choose the kernel of model ('SE'; 'Periodic'; 'Matern', 1; 'Matern', 2)
 
 num_rep = 100; % set the amount of samples
-sample_type = 'para&obs'; % choose the type of sampling ('para': p(y_rep|'para', x_heldout); 'para&obs': p(y_rep|'para', y_obs, x_heldout))
+sample_type = 'para'; % choose the type of sampling ('para': p(y_rep|'para', x_heldout); 'para&obs': p(y_rep|'para', y_obs, x_heldout))
 
 criteria = 'chi_square'; % choose one criteria for PPC ('number_of_mean'; 'norm_of_gradient'; 'chi_square')
 %% Data generation

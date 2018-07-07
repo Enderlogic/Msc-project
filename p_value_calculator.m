@@ -28,38 +28,15 @@ elseif strcmp(criteria, 'chi_square')
             K = feval(covfunc{:}, hyp.cov(:,i), x_test);
             K = (K + K') / 2;
             K = K + sample_hyp.lik.sigma2(i) * eye(size(x_test, 1));
-%             K = diag(diag(K));
             cri_data(i) = data_test' / K * data_test;
-%             cri_data2(i) = data_test' * data_test;
             cri_rep(i) = data_test_rep(:, i)' / K * data_test_rep(:, i);
-%             cri_rep2(i) = data_test_rep(:, i)' * data_test_rep(:, i);
         end
     elseif strcmp(sample_type, 'para&obs')
         for i = 1 : size(data_test_rep, 2)
             if strcmp(model_cov{1}, 'Periodic')
-                cov_periodic = @(X1, X2, magnitude, period, lengthScale) magnitude * exp(- 2 * sin(pi * (X1 * ones(1, size(X2, 1)) - ones(size(X1, 1), 1) * X2')/ period).^2 / (lengthScale)^2);
-                
-                cov_rr = cov_periodic(x_test, x_test, sample_hyp.cf{1}.magnSigma2(i), sample_hyp.cf{1}.period(i), sample_hyp.cf{1}.lengthScale(i));
-                cov_ro = cov_periodic(x_test, x_train, sample_hyp.cf{1}.magnSigma2(i), sample_hyp.cf{1}.period(i), sample_hyp.cf{1}.lengthScale(i));
-                cov_oo = cov_periodic(x_train, x_train, sample_hyp.cf{1}.magnSigma2(i), sample_hyp.cf{1}.period(i), sample_hyp.cf{1}.lengthScale(i));
-                
-                mean_rep = cov_ro * ((cov_oo + sample_hyp.lik.sigma2(i) * eye(size(x_train, 1))) \ data_train);
-                cov_rep = cov_rr - cov_ro * ((cov_oo + sample_hyp.lik.sigma2(i) * eye(size(x_train, 1))) \ cov_ro');
-                cov_rep = cov_rep + sample_hyp.lik.sigma2(i) * eye(size(x_test, 1));
-                
-%                 gpcf = gpcf_periodic('lengthScale', sample_hyp.cf{1}.lengthScale(i), 'magnSigma2', sample_hyp.cf{1}.magnSigma2(i), 'period', sample_hyp.cf{1}.period(i), 'decay', 0);
+                gpcf = gpcf_periodic('lengthScale', sample_hyp.cf{1}.lengthScale(i), 'magnSigma2', sample_hyp.cf{1}.magnSigma2(i), 'period', sample_hyp.cf{1}.period(i), 'decay', 0);
             elseif strcmp(model_cov{1}, 'SE')
-                cov_sexp = @(X1, X2, magnitude, lengthScale) magnitude * exp(- (X1 * ones(1, size(X2, 1)) - ones(size(X1, 1), 1) * X2').^2/2/(lengthScale^2));
-                
-                cov_rr = cov_sexp(x_test, x_test, sample_hyp.cf{1}.magnSigma2(i), sample_hyp.cf{1}.lengthScale(i));
-                cov_ro = cov_sexp(x_test, x_train, sample_hyp.cf{1}.magnSigma2(i), sample_hyp.cf{1}.lengthScale(i));
-                cov_oo = cov_sexp(x_train, x_train, sample_hyp.cf{1}.magnSigma2(i), sample_hyp.cf{1}.lengthScale(i));
-                
-                mean_rep = cov_ro * ((cov_oo + sample_hyp.lik.sigma2(i) * eye(size(x_train, 1))) \ data_train);
-                cov_rep = cov_rr - cov_ro * ((cov_oo + sample_hyp.lik.sigma2(i) * eye(size(x_train, 1))) \ cov_ro');
-                cov_rep = cov_rep + sample_hyp.lik.sigma2(i) * eye(size(x_test, 1));
-                
-%                 gpcf = gpcf_sexp('lengthScale', sample_hyp.cf{1}.lengthScale(i), 'magnSigma2', sample_hyp.cf{1}.magnSigma2(i));
+                gpcf = gpcf_sexp('lengthScale', sample_hyp.cf{1}.lengthScale(i), 'magnSigma2', sample_hyp.cf{1}.magnSigma2(i));
             elseif strcmp(model_cov{1}, 'Matern')
                 if model_cov{2} == 1
                     gpcf = gpcf_matern32('lengthScale', sample_hyp.cf{1}.lengthScale(i), 'magnSigma2', sample_hyp.cf{1}.magnSigma2(i));
@@ -71,11 +48,11 @@ elseif strcmp(criteria, 'chi_square')
             else
                 error('The type of covariance function is invalid')
             end
-%             lik = lik_gaussian('sigma2', sample_hyp.lik.sigma2(i));
-%             gp = gp_set('lik', lik, 'cf', gpcf);
-%             [EFT, VARFT, LPYT, EYT, VARYT] = gp_pred(gp, x_train, data_train, x_test);
-            cri_data(i) = (data_test - mean_rep)' / cov_rep * (data_test - mean_rep);
-            cri_rep(i) = (data_test_rep(:, i) - mean_rep)' / cov_rep * (data_test_rep(:, i) - mean_rep);
+            lik = lik_gaussian('sigma2', sample_hyp.lik.sigma2(i));
+            gp = gp_set('lik', lik, 'cf', gpcf);
+            [Eft, Varft, Lpyt, Eyt, Varyt, Covyt] = gp_pred(gp, x_train, data_train, x_test);
+            cri_data(i) = (data_test - Eyt)' / Covyt * (data_test - Eyt);
+            cri_rep(i) = (data_test_rep(:, i) - Eyt)' / Covyt * (data_test_rep(:, i) - Eyt);
         end
     else
         error('The type of sampling is invalid!')
@@ -84,6 +61,5 @@ else
     error('The criteria is invalid!')
 end
 p_value = 2 * min(sum(cri_rep > cri_data) / size(data_test_rep, 2), 1 - sum(cri_rep > cri_data) / size(data_test_rep, 2));
-% p_value2 = 2 * min(sum(cri_rep2 > cri_data2) / size(data_test_rep, 2), 1 - sum(cri_rep2 > cri_data2) / size(data_test_rep, 2));
 end
 
