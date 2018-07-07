@@ -68,7 +68,7 @@ if strcmp(model_cov{1}, 'Periodic')
     end
     pyp = lognpdf(pxp, log(prior.period.mu), prior.period.mu);
     figure('rend','painters','pos',[10 10 500 400])
-    [xp, np] = histnorm(sample_hyp.cf{1, 1}.period, 40, 'plot');
+    [xp, np] = histnorm(sample_hyp.cf{1, 1}.period, 200, 'plot');
     hold on
     plot(pxm, max(xp) / max(pyp) * pyp, 'r')
     vline(hyp_data.period, 'g', 'true value', 0.1)

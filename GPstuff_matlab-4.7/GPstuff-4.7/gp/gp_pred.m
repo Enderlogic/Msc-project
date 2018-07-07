@@ -9,7 +9,7 @@ function [Eft, Varft, lpyt, Eyt, Varyt] = gp_pred(gp, x, y, varargin)
 %    mean EFT and variance VARFT of latent variables.
 %
 %        Eft =  E[f | xt,x,y,th]  = K_fy*(Kyy+s^2I)^(-1)*y
-%      Varft = Var[f | xt,x,y,th] = diag(K_fy - K_fy*(Kyy+s^2I)^(-1)*K_yf). 
+%      Varft = Var[f | xt,x,y,th] = diag(K_fy - K_fy*(Kyy+s^2I)^(-1)*K_yf).
 %
 %    Each row of X corresponds to one input vector and each row of
 %    Y corresponds to one output vector.
@@ -199,7 +199,7 @@ if isfield(gp.lik, 'nondiagW') && ~ismember(gp.lik.type, {'LGP' 'LGPC'})
     if ~isempty(predcf)
       if ~iscell(predcf) || length(predcf)~=nout
         error(['GP_PRED: if own covariance for each output or latent process component is used,'...
-          'predcf has to be cell array and contain nout (vector) elements.   '])
+          'predcf has to be cell array and contain nout (vector) elements.'])
       end
     else
       predcf = gp.comp_cf;

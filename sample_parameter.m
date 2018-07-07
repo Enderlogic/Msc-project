@@ -8,6 +8,7 @@ function [sample_hyp] = sample_parameter(num_rep, x_train, data_train, prior, mo
 % Construct and Initialise GP model
 lik = lik_gaussian('sigma2', prior.sigma2.mu, 'sigma2_prior', prior.sigma2);
 if strcmp(model_cov{1}, 'Periodic')
+%     gpcf = gpcf_periodic();
     gpcf = gpcf_periodic('lengthScale', prior.lengthScale.mu, 'lengthScale_prior', prior.lengthScale, ...
         'magnSigma2', prior.magnSigma2.mu, 'magnSigma2_prior', prior.magnSigma2, ...
         'decay', 0, 'period', prior.period.mu, 'period_prior', prior.period);
@@ -18,6 +19,7 @@ elseif strcmp(model_cov{1}, 'Matern')
     if model_cov{2} == 1
         gpcf = gpcf_matern32('lengthScale', prior.lengthScale.mu, 'lengthScale_prior', prior.lengthScale, ...
             'magnSigma2', prior.magnSigma2.mu, 'magnSigma2_prior', prior.magnSigma2);
+%         gpcf = gpcf_matern32();
     elseif model_cov{2} == 2
         gpcf = gpcf_matern52('lengthScale', prior.lengthScale.mu, 'lengthScale_prior', prior.lengthScale, ...
             'magnSigma2', prior.magnSigma2.mu, 'magnSigma2_prior', prior.magnSigma2);
