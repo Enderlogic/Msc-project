@@ -17,6 +17,9 @@ elseif strcmp(data_cov{1}, 'SE')
 elseif strcmp(data_cov{1}, 'Matern')
     covfunc_data = {'covMaterniso', data_cov{2}};
     hyp.cov = log([hyp_data.lengthScale, sqrt(hyp_data.magnitude)]);
+elseif strcmp(data_cov{1}, 'RQ')
+    covfunc_data = {@covRQiso};
+    hyp.cov = log([hyp_data.lengthScale, sqrt(hyp_data.magnitude), hyp_data.alpha]);
 else
     error('The type of kernel function is invalid')
 end

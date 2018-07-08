@@ -17,6 +17,9 @@ if strcmp(sample_type, 'para')
     elseif strcmp(model_cov{1}, 'Matern')
         covfunc = {@covMaterniso, model_cov{2}};
         hyp.cov = log([sample_hyp.cf{1}.lengthScale, sqrt(sample_hyp.cf{1}.magnSigma2)])';
+    elseif strcmp(model_cov{1}, 'RQ')
+        covfunc = {@covRQiso};
+        hyp.cov = log([sample_hyp.cf{1}.lengthScale, sqrt(sample_hyp.cf{1}.magnSigma2), sample_hyp.cf{1}.alpha])';
     else
         error('The type of covariance function is invalid')
     end
@@ -42,6 +45,8 @@ elseif strcmp(sample_type, 'para&obs')
             else
                 error('Only support Matern 3/2 and Matern 5/2 covariance function!')
             end
+        elseif strcmp(model_cov{1}, 'RQ')
+            gpcf = gpcf_rq('lengthScale', sample_hyp.cf{1}.lengthScale(i), 'magnSigma2', sample_hyp.cf{1}.magnSigma2(i), 'alpha', sample_hyp.cf{1}.alpha(i));
         else
             error('The type of covariance function is invalid')
         end

@@ -70,11 +70,32 @@ if strcmp(model_cov{1}, 'Periodic')
     figure('rend','painters','pos',[10 10 500 400])
     [xp, np] = histnorm(sample_hyp.cf{1, 1}.period, 200, 'plot');
     hold on
-    plot(pxm, max(xp) / max(pyp) * pyp, 'r')
+    plot(pxp, max(xp) / max(pyp) * pyp, 'r')
     vline(hyp_data.period, 'g', 'true value', 0.1)
 %     vline(prior.period.mu, '--r', 'mean of prior', 0.2)
     vline(mean(sample_hyp.cf{1, 1}.period), '--', 'mean of posterior', 0.3)
     legend('posterior', 'prior')
     title(['Prior and posterior distribution of period in ' model_cov{1} ' kernel'])
+    ylabel('Probability')
+end
+%% Alpha
+if strcmp(model_cov{1}, 'RQ')
+    if prior.alpha.mu < min(sample_hyp.cf{1, 1}.alpha)
+        pxa = 1.2 * prior.alpha.mu - 0.2 * max(sample_hyp.cf{1, 1}.alpha) : 1.2 * (max(sample_hyp.cf{1, 1}.alpha) - prior.alpha.mu) / 400 : max(sample_hyp.cf{1, 1}.alpha);
+    elseif prior.alpha.mu > max(sample_hyp.cf{1, 1}.alpha)
+        pxa = min(sample_hyp.cf{1, 1}.alpha) : 1.2 * (prior.alpha.mu - min(sample_hyp.cf{1, 1}.alpha)) / 400 : 1.2 * prior.alpha.mu - 0.2 * min(sample_hyp.cf{1, 1}.alpha);
+    else
+        pxa = min(sample_hyp.cf{1, 1}.alpha) : (max(sample_hyp.cf{1, 1}.alpha) - min(sample_hyp.cf{1, 1}.alpha)) / 400 : max(sample_hyp.cf{1, 1}.alpha);
+    end
+    pya = lognpdf(pxa, log(prior.alpha.mu), prior.alpha.mu);
+    figure('rend','painters','pos',[10 10 500 400])
+    [xa, na] = histnorm(sample_hyp.cf{1, 1}.alpha, 200, 'plot');
+    hold on
+    plot(pxa, max(xa) / max(pya) * pya, 'r')
+    vline(hyp_data.alpha, 'g', 'true value', 0.1)
+%     vline(prior.period.mu, '--r', 'mean of prior', 0.2)
+    vline(mean(sample_hyp.cf{1, 1}.alpha), '--', 'mean of posterior', 0.3)
+    legend('posterior', 'prior')
+    title(['Prior and posterior distribution of alpha in ' model_cov{1} ' kernel'])
     ylabel('Probability')
 end

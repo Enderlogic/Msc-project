@@ -5,21 +5,23 @@ option_data = 'fic'; % choose ficticious data (fic) or real data (real)
 
 % set the hyperparameters of ficticious data set (not all of them will be used)
 hyp_data.magnitude = 10; % squared magnitude
-hyp_data.lengthScale = 2;
+hyp_data.lengthScale = 1;
 hyp_data.period = 2;
 hyp_data.sigma = 0.1;
-data_cov = {'Periodic'}; % choose a gaussian kernel for data ('SE'; 'Periodic'; 'Matern', 1; 'Matern', 2)
+hyp_data.alpha = 2;
+
+data_cov = {'Periodic'}; % choose a gaussian kernel for data ('SE'; 'Periodic'; 'Matern', 1; 'Matern', 2; 'RQ')
 num_data = 1000; % choose sampling number
 random_seed = 'on'; % choose random seed for data, if seed is 'on', the data will be the same
 
 ratio_train = 0.6; % set the ratio of training set among the whole set
 
-model_cov = {'Matern', 2}; %choose the kernel of model ('SE'; 'Periodic'; 'Matern', 1; 'Matern', 2)
+model_cov = {'Periodic'}; %choose the kernel of model ('SE'; 'Periodic'; 'Matern', 1; 'Matern', 2; 'RQ')
 
 num_rep = 100; % set the amount of samples
 sample_type = 'para'; % choose the type of sampling ('para': p(y_rep|'para', x_heldout); 'para&obs': p(y_rep|'para', y_obs, x_heldout))
 
-criteria = 'chi_square'; % choose one criteria for PPC ('number_of_mean'; 'norm_of_gradient'; 'chi_square')
+criteria = 'norm_of_gradient'; % choose one criteria for PPC ('number_of_mean'; 'norm_of_gradient'; 'chi_square')
 %% Data generation
 if strcmp(option_data, 'fic')
     [x, data] = data_generation(num_data, random_seed, hyp_data, data_cov);
@@ -44,18 +46,20 @@ hyp_mle.magnitude = 10; %squared magnitude
 hyp_mle.lengthScale = 3;
 hyp_mle.period = 2;
 hyp_mle.sigma = 0.1;
+hyp_mle.alpha = 1;
 
 hyp_mle = mle_gpml(hyp_mle, x_train, data_train, model_cov);
 disp('MLE solution complete!')
 %% Draw samples from posterior distribution of hyperparameters
 % set prior by MLE result
 prior.lengthScale = prior_loggaussian('s2', hyp_mle.lengthScale, 'mu', hyp_mle.lengthScale);
-% prior.lengthScale = prior_gaussian('s2', 0.1, 'mu', 10);
+% prior.lengthScale = prior_gaussian('s2', hyp_mle.lengthScale, 'mu', hyp_mle.lengthScale);
 prior.magnSigma2 = prior_loggaussian('s2', hyp_mle.magnitude, 'mu', hyp_mle.magnitude);
 % prior.magnSigma2 = prior_gaussian('s2', hyp_mle.magnitude, 'mu', hyp_mle.magnitude);
 prior.sigma2 = prior_loggaussian('s2', hyp_mle.sigma, 'mu', hyp_mle.sigma);
 % prior.sigma2 = prior_gaussian('s2', hyp_mle.sigma, 'mu', hyp_mle.sigma);
 prior.period = prior_loggaussian('s2', hyp_mle.period, 'mu', hyp_mle.period);
+prior.alpha = prior_loggaussian('s2', hyp_mle.alpha, 'mu', hyp_mle.alpha);
 
 sample_hyp = sample_parameter(num_rep, x_train, data_train, prior, model_cov);
 disp('Parameter sampling complete!')

@@ -26,6 +26,10 @@ elseif strcmp(model_cov{1}, 'Matern')
     else
         error('Only support Matern 3/2 and Matern 5/2 covariance function!')
     end
+elseif strcmp(model_cov{1}, 'RQ')
+    gpcf = gpcf_rq('lengthScale', prior.lengthScale.mu, 'lengthScale_prior', prior.lengthScale, ...
+        'magnSigma2', prior.magnSigma2.mu, 'magnSigma2_prior', prior.magnSigma2, ...
+        'alpha', prior.alpha.mu, 'alpha_prior', prior.alpha);
 else
     error('The type of kernel function for Sampling is invalid')
 end

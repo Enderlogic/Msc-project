@@ -5,8 +5,24 @@ if strcmp(criteria, 'number_of_mean')
     cri_data = sum(diff(data_test > mean(data_test)) ~= 0);
     cri_rep = sum(diff(data_test_rep > mean(data_test_rep)) ~= 0);
 elseif strcmp(criteria, 'norm_of_gradient')
-    cri_data = norm(gradient(data_test));
-    [~, ygrad] = gradient(data_test_rep);
+    % compute gradient with momentum
+    beta = 0.9;
+    par = (1 - beta) * fliplr(beta .^ (0 : size(data_test, 1) - 1))';
+    data_test_rescale = par .* data_test;
+    data_test_rep_rescale = par .* data_test_rep;
+    data_test_rescale = cumsum(data_test_rescale);
+    data_test_rep_rescale = cumsum(data_test_rep_rescale);
+    
+    par = beta .^ (1 - size(data_test, 1) : 0)';
+    data_test_rescale = data_test_rescale .* par;
+    data_test_rep_rescale = data_test_rep_rescale .* par;
+    
+    par = 1 - beta .^ (1 : size(data_test, 1))';
+    data_test_rescale = data_test_rescale ./ par;
+    data_test_rep_rescale = data_test_rep_rescale ./ par;
+    
+    cri_data = norm(gradient(data_test_rescale));
+    [~, ygrad] = gradient(data_test_rep_rescale);
     cri_rep = vecnorm(ygrad);
 elseif strcmp(criteria, 'chi_square')
     cri_data = zeros(size(data_test_rep, 2), 1);
@@ -21,6 +37,9 @@ elseif strcmp(criteria, 'chi_square')
         elseif strcmp(model_cov{1}, 'Matern')
             covfunc = {@covMaterniso, model_cov{2}};
             hyp.cov = log([sample_hyp.cf{1}.lengthScale, sqrt(sample_hyp.cf{1}.magnSigma2)])';
+        elseif strcmp(model_cov{1}, 'RQ')
+            covfunc = {@covRQiso};
+            hyp.cov = log([sample_hyp.cf{1}.lengthScale, sqrt(sample_hyp.cf{1}.magnSigma2), sample_hyp.cf{1}.alpha])';
         else
             error('The type of covariance function is invalid')
         end
@@ -45,6 +64,8 @@ elseif strcmp(criteria, 'chi_square')
                 else
                     error('Only support Matern 3/2 and Matern 5/2 covariance function!')
                 end
+            elseif strcmp(model_cov{1}, 'RQ')
+                gpcf = gpcf_rq('lengthScale', sample_hyp.cf{1}.lengthScale(i), 'magnSigma2', sample_hyp.cf{1}.magnSigma2(i), 'alpha', sample_hyp.cf{1}.alpha(i));
             else
                 error('The type of covariance function is invalid')
             end
