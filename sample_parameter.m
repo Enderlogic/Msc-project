@@ -16,11 +16,10 @@ elseif strcmp(model_cov{1}, 'SE')
     gpcf = gpcf_sexp('lengthScale', prior.lengthScale.mu, 'lengthScale_prior', prior.lengthScale, ...
         'magnSigma2', prior.magnSigma2.mu, 'magnSigma2_prior', prior.magnSigma2);
 elseif strcmp(model_cov{1}, 'Matern')
-    if model_cov{2} == 1
+    if model_cov{2} == 3
         gpcf = gpcf_matern32('lengthScale', prior.lengthScale.mu, 'lengthScale_prior', prior.lengthScale, ...
             'magnSigma2', prior.magnSigma2.mu, 'magnSigma2_prior', prior.magnSigma2);
-%         gpcf = gpcf_matern32();
-    elseif model_cov{2} == 2
+    elseif model_cov{2} == 5
         gpcf = gpcf_matern52('lengthScale', prior.lengthScale.mu, 'lengthScale_prior', prior.lengthScale, ...
             'magnSigma2', prior.magnSigma2.mu, 'magnSigma2_prior', prior.magnSigma2);
     else

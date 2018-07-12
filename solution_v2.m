@@ -5,26 +5,27 @@ option_data = 'fic'; % choose ficticious data (fic) or real data (real)
 
 % set the hyperparameters of ficticious data set (not all of them will be used)
 hyp_data.magnitude = 10; % squared magnitude
-hyp_data.lengthScale = 1;
-hyp_data.period = 2;
+hyp_data.lengthScale = 6;
+hyp_data.period = 1;
 hyp_data.sigma = 0.1;
-hyp_data.alpha = 2;
+hyp_data.alpha = 5;
 
-data_cov = {'Periodic'}; % choose a gaussian kernel for data ('SE'; 'Periodic'; 'Matern', 1; 'Matern', 2; 'RQ')
+data_cov = {'SE'}; % choose a kernel for generation model ('SE'; 'Periodic'; 'Matern', 3 (nu = 3/2); 'Matern', 5 (nu = 5/2); 'RQ')
 num_data = 1000; % choose sampling number
+length = 10; % choose the length of data
 random_seed = 'on'; % choose random seed for data, if seed is 'on', the data will be the same
 
 ratio_train = 0.6; % set the ratio of training set among the whole set
 
-model_cov = {'Periodic'}; %choose the kernel of model ('SE'; 'Periodic'; 'Matern', 1; 'Matern', 2; 'RQ')
+model_cov = {'Matern', 3}; %choose a kernel for fitted model ('SE'; 'Periodic'; 'Matern', 3 (nu = 3/2); 'Matern', 5 (nu = 5/2); 'RQ')
 
-num_rep = 100; % set the amount of samples
+num_rep = 50; % set the amount of samples
 sample_type = 'para'; % choose the type of sampling ('para': p(y_rep|'para', x_heldout); 'para&obs': p(y_rep|'para', y_obs, x_heldout))
 
-criteria = 'frequency'; % choose one criteria for PPC ('number_of_zero'; 'norm_of_gradient'; 'chi_square')
+criteria = 'chi_square'; % choose one criteria for PPC or MMD ('number_of_zero'; 'norm_of_gradient'; 'chi_square'; 'mmd')
 %% Data generation
 if strcmp(option_data, 'fic')
-    [x, data] = data_generation(num_data, random_seed, hyp_data, data_cov);
+    [x, data] = data_generation(num_data, length, random_seed, hyp_data, data_cov);
 elseif strcmp(option_data, 'real')
     data = xlsread('mean-daily-temperature-fisher-ri.xlsx');
     num_data = size(data, 1);
@@ -43,10 +44,10 @@ disp('Data generation complete!')
 %% Compute MLE solution using gpml
 %initilise the hyperparameters for MLE
 hyp_mle.magnitude = 10; %squared magnitude
-hyp_mle.lengthScale = 3;
-hyp_mle.period = 2;
-hyp_mle.sigma = 0.1;
-hyp_mle.alpha = 1;
+hyp_mle.lengthScale = 6;
+hyp_mle.period = 1;
+hyp_mle.sigma = 0.01;
+hyp_mle.alpha = 5;
 
 hyp_mle = mle_gpml(hyp_mle, x_train, data_train, model_cov);
 disp('MLE solution complete!')
