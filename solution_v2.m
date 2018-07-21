@@ -5,7 +5,7 @@ option_data = 'real'; % choose ficticious data (fic) or real data (real)
 % data_name = {'SE'};
 data_name = {'14'};
 % model_cov = {'Matern', '3'};
-ratio_train = 0.8; % set the ratio of training set among the whole set
+ratio_train = 0.85; % set the ratio of training set among the whole set
 num_rep = 30; % set the amount of samples
 
 model_cov = {'sum', 'SE', 'Periodic'}; % 'SE'; 'Periodic'; 'Matern', '3'; 'Matern', '5', 'Exp', 'RQ' for single kernel
