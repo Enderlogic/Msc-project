@@ -1,4 +1,4 @@
-function [p_value] = p_value_calculator(data_test, data_test_rep, criteria, sample_type, model_cov, sample_hyp, x_train, data_train, x_test)
+function [p_value] = p_value_calculator(data_test, data_test_rep, criteria, model_cov, sample_hyp, x_train, data_train, x_test)
     % criteria: number_of_zero; norm_of_gradient; chi_square
     % [p_value] = p_value_calculator(data_test, data_test_rep, criteria, sample_type, model_cov, sample_hyp, x_train, data_train, x_test)
     if strcmp(criteria, 'mmd')
@@ -62,27 +62,25 @@ function [p_value] = p_value_calculator(data_test, data_test_rep, criteria, samp
                 if strcmp(model_cov{1}, 'sum') || strcmp(model_cov{1}, 'prod')
                     hyp.cov = [];
                     if strcmp(model_cov{1}, 'sum')
-                        covfunc = {'covSum'};
+                        covfunc = {'covSum', {}};
                     else
-                        covfunc = {'covProd'};
+                        covfunc = {'covProd', {}};
                     end
-                    cov = strings(1, (size(model_cov, 2) - 1));
                     for i = 1 : size(model_cov, 2) - 1
                         switch model_cov{i + 1}
                             case 'SE'
-                                cov(i) = 'covSEiso';
+                                covfunc{2} = [covfunc{2}, 'covSEiso'];
                                 hyp.cov = [hyp.cov; log([sample_hyp.cf{1, 1}.cf{1, i}.lengthScale'; sqrt(sample_hyp.cf{1, 1}.cf{1, i}.magnSigma2')])];
                             case 'LIN'
-                                cov(i) = 'covLINiso';
+                                covfunc{2} = [covfunc{2}, 'covLINiso'];
                                 hyp.cov = [hyp.cov; log(sample_hyp.cf{1, 1}.cf{1, i}.coeffSigma2')];
                             case 'Periodic'
-                                cov(i) = 'covPeriodic';
+                                covfunc{2} = [covfunc{2}, 'covPeriodic'];
                                 hyp.cov = [hyp.cov; log([sample_hyp.cf{1, 1}.cf{1, i}.lengthScale'; sample_hyp.cf{1, 1}.cf{1, i}.period'; sqrt(sample_hyp.cf{1, 1}.cf{1, i}.magnSigma2')])];
                             otherwise
                                 error('The type of covariance funciton is invalid for composition!')
                         end
                     end
-                    covfunc{end + 1} = cov;
                 elseif strcmp(model_cov{1}, 'Periodic')
                     covfunc = {@covPeriodic};
                     hyp.cov = log([sample_hyp.cf{1}.lengthScale, sample_hyp.cf{1}.period, sqrt(sample_hyp.cf{1}.magnSigma2)])';

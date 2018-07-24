@@ -2,13 +2,13 @@ clear
 close all
 %% Setting for data, model and PPC
 option_data = 'real'; % choose ficticious data (fic) or real data (real)
-% data_name = {'SE'};
-data_name = {'14'};
+% data_name = {'Periodic'};
+data_name = {'3'}; % choose the real data from the 1st file to the 14th file
 % model_cov = {'Matern', '3'};
-ratio_train = 0.85; % set the ratio of training set among the whole set
-num_rep = 30; % set the amount of samples
+ratio_train = 0.8; % set the ratio of training set among the whole set
+num_rep = 50; % set the amount of samples
 
-model_cov = {'sum', 'SE', 'Periodic'}; % 'SE'; 'Periodic'; 'Matern', '3'; 'Matern', '5', 'Exp', 'RQ' for single kernel
+model_cov = {'prod', 'Periodic','LIN'}; % 'SE'; 'Periodic'; 'Matern', '3'; 'Matern', '5', 'Exp', 'RQ' for single kernel
                                         % 'SE'; 'LIN'; 'Periodic' for 'sum'
                                         % and 'prod' mixing kernel
                                         % example: 'sum', 'SE', 'LIN' =
@@ -25,5 +25,5 @@ else
     [data_test, data_test_rep, sample_hyp, x_train, data_train, x_test] = model_generation(option_data, data_name, ratio_train, model_cov, sample_type, num_rep, save);
 end
 %% Compute posterior p-value
-p_value = p_value_calculator(data_test, data_test_rep, criteria, sample_type, model_cov, sample_hyp, x_train, data_train, x_test);
+p_value = p_value_calculator(data_test, data_test_rep, criteria, model_cov, sample_hyp, x_train, data_train, x_test);
 % disp(['p-value:',num2str(p_value)])

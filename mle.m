@@ -15,28 +15,26 @@ function [prior] = mle(hyp_mle, x, data, model_cov)
     prior = {};
     if strcmp(model_cov{1}, 'sum') || strcmp(model_cov{1}, 'prod')
         if strcmp(model_cov{1}, 'sum')
-            covfunc = {'covSum'};
+            covfunc = {'covSum', {}};
         else
-            covfunc = {'covProd'};
+            covfunc = {'covProd', {}};
         end
-        cov = strings(1, (size(model_cov, 2) - 1));
         for i = 1 : size(model_cov, 2) - 1
             switch model_cov{i + 1}
                 case 'SE'
-                    cov(i) = 'covSEiso';
+                    covfunc{2} = [covfunc{2}, 'covSEiso'];
                     hyp.cov = [hyp.cov; log([hyp_mle.lengthScale; sqrt(hyp_mle.magnSigma2)])];
                 case 'LIN'
-                    cov(i) = 'covLINiso';
+                    covfunc{2} = [covfunc{2}, 'covLINiso'];
                     hyp.cov = [hyp.cov; log(hyp_mle.lengthScale)];
                 case 'Periodic'
-                    cov(i) = 'covPeriodic';
+                    covfunc{2} = [covfunc{2}, 'covPeriodic'];
                     hyp.cov = [hyp.cov; log([hyp_mle.lengthScale; hyp_mle.period; sqrt(hyp_mle.magnSigma2)])];
                 otherwise
                     error('The type of covariance funciton is invalid for composition!')
             end
         end
-        covfunc{end + 1} = cov;
-        hyp = minimize(hyp, @gp, -100, @infGaussLik, [], covfunc, likfunc, x, data);
+        hyp = minimize(hyp, @gp, -150, @infGaussLik, [], covfunc, likfunc, x, data);
         ord = 1;
         for i = 1 : size(model_cov, 2) - 1
             switch model_cov{i + 1}

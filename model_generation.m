@@ -35,8 +35,8 @@ function [data_test, data_test_rep, sample_hyp, x_train, data_train, x_test] = m
     %% Compute MLE solution using gpml
     %initilise the hyperparameters for MLE
     hyp_mle.magnSigma2 = 100; %squared magnitude
-    hyp_mle.lengthScale = 100;
-    hyp_mle.period = 400;
+    hyp_mle.lengthScale = 5;
+    hyp_mle.period = 10;
     hyp_mle.sigma2 = 0.01;
     hyp_mle.alpha = 2;
 

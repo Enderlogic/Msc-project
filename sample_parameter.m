@@ -64,13 +64,13 @@ function [sample_hyp] = sample_parameter(num_rep, x_train, data_train, prior, mo
     gp = gp_optim(gp, x_train, data_train, 'opt', opt);
 
     % Monte Carlo sampling
-    num_thin = round(0.2 * num_rep);
-%     % Set some options for HMC
-%     hmc_opt.nsamples=1;
-%     hmc_opt.decay=0.8;
-%     hmc_opt.persistence=0;
-%     hmc_opt.stepadj=0.04;
-%     hmc_opt.steps=10;
-    [sample_hyp,g,opt]=gp_mc(gp, x_train, data_train, 'nsamples', num_rep + num_thin - 1, 'display',num_thin);
+    num_thin = round(0.5 * num_rep);
+    % Set some options for HMC
+    hmc_opt.nsamples=1;
+    hmc_opt.decay=0.8;
+    hmc_opt.persistence=0;
+    hmc_opt.stepadj=0.04;
+    hmc_opt.steps=10;
+    [sample_hyp,g,opt]=gp_mc(gp, x_train, data_train, 'nsamples', num_rep + num_thin - 1, 'hmc', hmc_opt, 'display',num_thin);
     sample_hyp=thin(sample_hyp, num_thin);
 end
