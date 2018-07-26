@@ -1,11 +1,17 @@
-function [data_rep] = sample_data(sample_hyp, model_cov, sample_type, x_train, data_train, x_test)
+function [data_rep] = sample_data(sample_hyp, model_cov, sample_location, sample_type, x_train, data_train, x_test)
     % num_rep: the number of replicated data
     % sample_hyp: the posterior samples of hyperparameters
     % model_cov: the covariance function usedted in the fit model
 
     % [yt] = sample_data(num_rep, sample_hyp, model_cov, sample_type, x_train, data_train, x_test);
     num_rep = size(sample_hyp.lik.sigma2, 1);
-    num_data = size(x_test, 1);
+    if strcmp(sample_location, 'test')
+        num_data = size(x_test, 1);
+    elseif strcmp(sample_location, 'train')
+        num_data = size(x_train, 1);
+    else
+        error('The type of sample location is invalid!')
+    end
     if strcmp(sample_type, 'para') || strcmp(sample_type, 'both')
         data_rep.para = zeros(num_data, num_rep);
         if strcmp(model_cov{1}, 'sum') || strcmp(model_cov{1}, 'prod')
@@ -50,7 +56,13 @@ function [data_rep] = sample_data(sample_hyp, model_cov, sample_type, x_train, d
         end
         mu = zeros(1, num_data); % assume using zero mean function, more non-zero mean functions will be finished later
         for i = 1 : num_rep
-            K = feval(covfunc{:}, hyp.cov(:,i), x_test);
+            if strcmp(sample_location, 'test')
+                K = feval(covfunc{:}, hyp.cov(:,i), x_test);
+            elseif strcmp(sample_location, 'train')
+                K = feval(covfunc{:}, hyp.cov(:,i), x_train);
+            else
+                error('The type of sample location is invalid!')
+            end
             K = (K + K') / 2;
             data_rep.para(:, i) = mvnrnd(mu, K)';
             data_rep.para(:, i) = mvnrnd(data_rep.para(:, i), sample_hyp.lik.sigma2(i) * eye(num_data));
@@ -101,7 +113,13 @@ function [data_rep] = sample_data(sample_hyp, model_cov, sample_type, x_train, d
                 error('The type of covariance function is invalid')
             end
             gp = gp_set('lik', lik, 'cf', gpcf);
-            [~, data_rep.para_obs(:,i)] = gp_rnd(gp, x_train, data_train, x_test);
+            if strcmp(sample_location, 'test')
+                [~, data_rep.para_obs(:,i)] = gp_rnd(gp, x_train, data_train, x_test);
+            elseif strcmp(sample_location, 'train')
+                [~, data_rep.para_obs(:,i)] = gp_rnd(gp, x_train, data_train, x_train);
+            else
+                error('The type of sample location is invalid!')
+            end
         end
     end
 end

@@ -1,8 +1,10 @@
 function [x,data] = data_generation(hyp_data, num_data)
     % choose the kernel function of data from:
-    % Matern kernel (Matern)
+    % Matern kernel ('Matern', '3'; 'Matern', '5')
     % SE kernel (SE)
     % Periodic kernel (Periodic)
+    % Rational quadratic kernel (RQ)
+    % Exponential kernel (Exp)
 
     %choose fixed random data or variational random data ('on' or 'off')
 
@@ -20,7 +22,7 @@ function [x,data] = data_generation(hyp_data, num_data)
     elseif strcmp(hyp_data.data_cov{1}, 'RQ')
         covfunc_data = {@covRQiso};
         hyp.cov = log([hyp_data.lengthScale, sqrt(hyp_data.magnSigma2), hyp_data.alpha]);
-    elseif strcmp(hyp_data.data_cov{1}, 'SE')
+    elseif strcmp(hyp_data.data_cov{1}, 'Exp')
         covfunc = {@covMaterniso, 1};
         hyp.cov = log([hyp_mle.lengthScale; sqrt(hyp_mle.magnSigma2)]);
     else
