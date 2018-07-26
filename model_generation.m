@@ -49,12 +49,12 @@ function [data_test, data_rep, sample_hyp, x_train, data_train, x_test] = model_
     disp('Data sampling complete!')
     %% Save the useful information
     if save
-        if strcmp(option_data, 'fic')
+        if strcmp(option_data, 'syn')
             filename = strcat('model\', option_data, '_', strjoin(hyp_data.data_cov), '_', strjoin(model_cov), '_', sample_type, '.mat');
-            save(filename, 'data_test', 'data_test_rep', 'hyp_data', 'x_train', 'x_test', 'data_train', 'model_cov', 'prior', 'ratio_train', 'sample_hyp', 'sample_type')
+            save(filename, 'data_test', 'data_rep', 'hyp_data', 'x_train', 'x_test', 'data_train', 'model_cov', 'prior', 'ratio_train', 'sample_hyp', 'sample_type')
         elseif strcmp(option_data, 'real')
             filename = strcat('model\', option_data, '_', strjoin(model_cov), '_', sample_type, '.mat');
-            save(filename, 'data_test', 'data_test_rep', 'x_train', 'x_test', 'data_train', 'model_cov', 'prior', 'ratio_train', 'sample_hyp', 'sample_type')
+            save(filename, 'data_test', 'data_rep', 'x_train', 'x_test', 'data_train', 'model_cov', 'prior', 'ratio_train', 'sample_hyp', 'sample_type')
         else
             error('The source of observation is invalid')
         end
