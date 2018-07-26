@@ -1,4 +1,4 @@
-function [data_test, data_rep, sample_hyp, x_train, data_train, x_test] = model_generation(option_data, data_name, ratio_train, model_cov, sample_location, sample_type, num_rep, save)
+function [data_test, data_rep, sample_hyp, x_train, data_train, x_test] = model_generation(option_data, data_name, ratio_train, model_cov, sample_location, sample_type, num_rep, save_option)
     %% Data generation
     if strcmp(option_data, 'syn')
         % set the hyperparameters of ficticious data set (not all of them will be used)
@@ -48,7 +48,7 @@ function [data_test, data_rep, sample_hyp, x_train, data_train, x_test] = model_
     data_rep = sample_data(sample_hyp, model_cov, sample_location, sample_type, x_train, data_train, x_test);
     disp('Data sampling complete!')
     %% Save the useful information
-    if save
+    if save_option
         if strcmp(option_data, 'syn')
             filename = strcat('model\', option_data, '_', strjoin(hyp_data.data_cov), '_', strjoin(model_cov), '_', sample_type, '.mat');
             save(filename, 'data_test', 'data_rep', 'hyp_data', 'x_train', 'x_test', 'data_train', 'model_cov', 'prior', 'ratio_train', 'sample_hyp', 'sample_type')

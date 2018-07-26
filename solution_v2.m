@@ -22,7 +22,7 @@ sample_location = 'test'; % choose the location of replications: 'test' for test
 sample_type = 'both'; % choose the type of samples: 'para': p(y^rep|para)
                         % 'para&obs'; p(y^rep|para, y^obs)
                         % 'both': draw from both of the two distributions
-save = false; % true: save the parameters and data; false: not save
+save_option = false; % true: save the parameters and data; false: not save
 
 criteria = 'chi_square'; % choose one criteria for PPC or MMD ('number_of_zero'; 'norm_of_gradient'; 'chi_square'; 'mmd')
 %% Load existing model otherwise generate new model
@@ -30,7 +30,7 @@ filename = strcat('model\', option_data, '_', strjoin(data_name), '_', strjoin(m
 if exist(filename, 'file') == 2
     load(filename)
 else
-    [data_test, data_rep, sample_hyp, x_train, data_train, x_test] = model_generation(option_data, data_name, ratio_train, model_cov, sample_location, sample_type, num_rep, save);
+    [data_test, data_rep, sample_hyp, x_train, data_train, x_test] = model_generation(option_data, data_name, ratio_train, model_cov, sample_location, sample_type, num_rep, save_option);
 end
 %% Compute posterior p-value
 p_value = p_value_calculator(data_test, data_rep, criteria, model_cov, sample_location, sample_hyp, x_train, data_train, x_test);
