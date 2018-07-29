@@ -1,4 +1,4 @@
-function [data_test, data_rep, sample_hyp, x_train, data_train, x_test] = model_generation(option_data, data_name, ratio_train, model_cov, sample_location, sample_type, num_rep, save_option)
+function [data_test, data_rep, sample_hyp, x_train, data_train, x_test, hyp_data, prior] = model_generation(option_data, data_name, ratio_train, model_cov, sample_location, sample_type, num_rep, save_option)
     %% Data generation
     if strcmp(option_data, 'syn')
         % set the hyperparameters of ficticious data set (not all of them will be used)
@@ -9,7 +9,7 @@ function [data_test, data_rep, sample_hyp, x_train, data_train, x_test] = model_
         hyp_data.alpha = 5;
         hyp_data.length = 20; % choose the length of data
         hyp_data.random_seed = true; % choose random seed for data, if seed is true, the data will be the same; if seed is false, the data will be different every time
-        hyp_data.data_cov = data_name; % choose a kernel for generation model ('SE'; 'Periodic'; 'Matern', '3' (nu = 3/2); 'Matern', '5' (nu = 5/2); 'RQ')
+        hyp_data.data_name = data_name; % choose a kernel for generation model ('SE'; 'Periodic'; 'Matern', '3' (nu = 3/2); 'Matern', '5' (nu = 5/2); 'RQ')
         num_data = 1000; % choose sampling number
 
         [x, data] = data_generation(hyp_data, num_data);
@@ -33,11 +33,20 @@ function [data_test, data_rep, sample_hyp, x_train, data_train, x_test] = model_
     disp('Data generation complete!')
     %% Compute MLE solution using gpml
     %initilise the hyperparameters for MLE
-    hyp_mle.magnSigma2 = 10; %squared magnitude
-    hyp_mle.lengthScale = 1;
-    hyp_mle.period = 10;
+    hyp_mle.SE.magnSigma2 = 20; %squared magnitude
+    hyp_mle.SE.lengthScale = 2;
+    hyp_mle.Periodic.magnSigma2 = 100; %squared magnitude
+    hyp_mle.Periodic.lengthScale = 10;
+    hyp_mle.Periodic.period = 1;
+    hyp_mle.Matern.magnSigma2 = 10;
+    hyp_mle.Matern.lengthScale = 2;
+    hyp_mle.Exp.magnSigma2 = 10;
+    hyp_mle.Exp.lengthScale = 2;
+    hyp_mle.LIN.lengthScale = 40;
+    hyp_mle.RQ.magnSigma2 = 20; %squared magnitude
+    hyp_mle.RQ.lengthScale = 4;
+    hyp_mle.RQ.alpha = 2;
     hyp_mle.sigma2 = 0.01;
-    hyp_mle.alpha = 2;
 
     prior = mle(hyp_mle, x_train, data_train, model_cov);
     disp('MLE solution complete!')
@@ -49,12 +58,11 @@ function [data_test, data_rep, sample_hyp, x_train, data_train, x_test] = model_
     disp('Data sampling complete!')
     %% Save the useful information
     if save_option
+        filename = strcat('model\', option_data, '_', strjoin(data_name), '_', strjoin(model_cov), '_', sample_type, '.mat');
         if strcmp(option_data, 'syn')
-            filename = strcat('model\', option_data, '_', strjoin(hyp_data.data_cov), '_', strjoin(model_cov), '_', sample_type, '.mat');
-            save(filename, 'data_test', 'data_rep', 'hyp_data', 'x_train', 'x_test', 'data_train', 'model_cov', 'prior', 'ratio_train', 'sample_hyp', 'sample_type')
+            save(filename, 'data_test', 'data_rep', 'hyp_data', 'data_name', 'x_train', 'x_test', 'data_train', 'model_cov', 'sample_location', 'prior', 'ratio_train', 'sample_hyp', 'sample_type')
         elseif strcmp(option_data, 'real')
-            filename = strcat('model\', option_data, '_', strjoin(model_cov), '_', sample_type, '.mat');
-            save(filename, 'data_test', 'data_rep', 'x_train', 'x_test', 'data_train', 'model_cov', 'prior', 'ratio_train', 'sample_hyp', 'sample_type')
+            save(filename, 'data_test', 'data_rep', 'data_name', 'x_train', 'x_test', 'data_train', 'model_cov', 'sample_location', 'prior', 'ratio_train', 'sample_hyp', 'sample_type')
         else
             error('The source of observation is invalid')
         end

@@ -12,8 +12,8 @@ data_name = {'SE'};% choose the kernel function of synthetic data from:
 % model_cov = {'Matern', '3'};
 
 ratio_train = 0.6; % set the ratio of training set among the whole set.
-num_rep = 20; % set the amount of samples
-model_cov = {'RQ'}; % 'SE'; 'Periodic'; 'Matern', '3'; 'Matern', '5', 'Exp', 'RQ' for single kernel
+num_rep = 50; % set the amount of samples
+model_cov = {'SE'}; % 'SE'; 'Periodic'; 'Matern', '3'; 'Matern', '5', 'Exp', 'RQ' for single kernel
                                         % 'SE'; 'LIN'; 'Periodic' for 'sum'
                                         % and 'prod' mixing kernel
                                         % example: 'sum', 'SE', 'LIN' =
@@ -30,7 +30,7 @@ filename = strcat('model\', option_data, '_', strjoin(data_name), '_', strjoin(m
 if exist(filename, 'file') == 2
     load(filename)
 else
-    [data_test, data_rep, sample_hyp, x_train, data_train, x_test] = model_generation(option_data, data_name, ratio_train, model_cov, sample_location, sample_type, num_rep, save_option);
+    [data_test, data_rep, sample_hyp, x_train, data_train, x_test, hyp_data, prior] = model_generation(option_data, data_name, ratio_train, model_cov, sample_location, sample_type, num_rep, save_option);
 end
 %% Compute posterior p-value
 p_value = p_value_calculator(data_test, data_rep, criteria, model_cov, sample_location, sample_hyp, x_train, data_train, x_test);

@@ -23,13 +23,13 @@ function [prior] = mle(hyp_mle, x, data, model_cov)
             switch model_cov{i + 1}
                 case 'SE'
                     covfunc{2} = [covfunc{2}, 'covSEiso'];
-                    hyp.cov = [hyp.cov; log([hyp_mle.lengthScale; sqrt(hyp_mle.magnSigma2)])];
+                    hyp.cov = [hyp.cov; log([hyp_mle.SE.lengthScale; sqrt(hyp_mle.SE.magnSigma2)])];
                 case 'LIN'
                     covfunc{2} = [covfunc{2}, 'covLINiso'];
-                    hyp.cov = [hyp.cov; log(hyp_mle.lengthScale)];
+                    hyp.cov = [hyp.cov; log(hyp_mle.LIN.lengthScale)];
                 case 'Periodic'
                     covfunc{2} = [covfunc{2}, 'covPeriodic'];
-                    hyp.cov = [hyp.cov; log([hyp_mle.lengthScale; hyp_mle.period; sqrt(hyp_mle.magnSigma2)])];
+                    hyp.cov = [hyp.cov; log([hyp_mle.Periodic.lengthScale; hyp_mle.Periodic.period; sqrt(hyp_mle.Periodic.magnSigma2)])];
                 otherwise
                     error('The type of covariance funciton is invalid for composition!')
             end
@@ -57,33 +57,33 @@ function [prior] = mle(hyp_mle, x, data, model_cov)
     else
         if strcmp(model_cov{1}, 'Periodic')
             covfunc = {@covPeriodic};
-            hyp.cov = log([hyp_mle.lengthScale; hyp_mle.period; sqrt(hyp_mle.magnSigma2)]);
+            hyp.cov = log([hyp_mle.Periodic.lengthScale; hyp_mle.Periodic.period; sqrt(hyp_mle.Periodic.magnSigma2)]);
             hyp = minimize(hyp, @gp, -100, @infGaussLik, [], covfunc, likfunc, x, data);
             hyp_mle.Periodic.lengthScale = exp(hyp.cov(1));
             hyp_mle.Periodic.period = exp(hyp.cov(2));
             hyp_mle.Periodic.magnSigma2 = exp(hyp.cov(3))^2;
         elseif strcmp(model_cov{1}, 'SE')
             covfunc = {@covSEiso};
-            hyp.cov = log([hyp_mle.lengthScale; sqrt(hyp_mle.magnSigma2)]);
+            hyp.cov = log([hyp_mle.SE.lengthScale; sqrt(hyp_mle.SE.magnSigma2)]);
             hyp = minimize(hyp, @gp, -100, @infGaussLik, [], covfunc, likfunc, x, data);
             hyp_mle.SE.lengthScale = exp(hyp.cov(1));
             hyp_mle.SE.magnSigma2 = exp(hyp.cov(2))^2;
         elseif strcmp(model_cov{1}, 'Matern')
             covfunc = {@covMaterniso, str2double(model_cov{2})};
-            hyp.cov = log([hyp_mle.lengthScale; sqrt(hyp_mle.magnSigma2)]);
+            hyp.cov = log([hyp_mle.Matern.lengthScale; sqrt(hyp_mle.Matern.magnSigma2)]);
             hyp = minimize(hyp, @gp, -100, @infGaussLik, [], covfunc, likfunc, x, data);
             hyp_mle.Matern.lengthScale = exp(hyp.cov(1));
             hyp_mle.Matern.magnSigma2 = exp(hyp.cov(2))^2;
         elseif strcmp(model_cov{1}, 'RQ')
             covfunc = {@covRQiso};
-            hyp.cov = log([hyp_mle.lengthScale; sqrt(hyp_mle.magnSigma2); hyp_mle.alpha]);
+            hyp.cov = log([hyp_mle.RQ.lengthScale; sqrt(hyp_mle.RQ.magnSigma2); hyp_mle.RQ.alpha]);
             hyp = minimize(hyp, @gp, -100, @infGaussLik, [], covfunc, likfunc, x, data);
             hyp_mle.RQ.lengthScale = exp(hyp.cov(1));
             hyp_mle.RQ.magnSigma2 = exp(hyp.cov(2))^2;
             hyp_mle.RQ.alpha = exp(hyp.cov(3));
         elseif strcmp(model_cov{1}, 'Exp')
             covfunc = {@covMaterniso, 1};
-            hyp.cov = log([hyp_mle.lengthScale; sqrt(hyp_mle.magnSigma2)]);
+            hyp.cov = log([hyp_mle.Exp.lengthScale; sqrt(hyp_mle.Exp.magnSigma2)]);
             hyp = minimize(hyp, @gp, -100, @infGaussLik, [], covfunc, likfunc, x, data);
             hyp_mle.Exp.lengthScale = exp(hyp.cov(1));
             hyp_mle.Exp.magnSigma2 = exp(hyp.cov(2))^2;
@@ -94,9 +94,12 @@ function [prior] = mle(hyp_mle, x, data, model_cov)
     %% set prior by using MLE
     hyp_mle.sigma2 = exp(hyp.lik);
     prior.sigma2 = prior_gaussian('s2', hyp_mle.sigma2, 'mu', hyp_mle.sigma2);
+%     prior.sigma2 = prior_loggaussian('s2', hyp_mle.sigma2, 'mu', hyp_mle.sigma2);
     if isfield(hyp_mle, 'SE')
         prior.SE.lengthScale = prior_gaussian('s2', hyp_mle.SE.lengthScale, 'mu', hyp_mle.SE.lengthScale);
         prior.SE.magnSigma2 = prior_gaussian('s2', hyp_mle.SE.magnSigma2, 'mu', hyp_mle.SE.magnSigma2);
+%         prior.SE.lengthScale = prior_loggaussian('s2', hyp_mle.SE.lengthScale, 'mu', hyp_mle.SE.lengthScale);
+%         prior.SE.magnSigma2 = prior_loggaussian('s2', hyp_mle.SE.magnSigma2, 'mu', hyp_mle.SE.magnSigma2);
     end
     if isfield(hyp_mle, 'LIN')
         prior.LIN.lengthScale = prior_gaussian('s2', hyp_mle.LIN.lengthScale, 'mu', hyp_mle.LIN.lengthScale);
