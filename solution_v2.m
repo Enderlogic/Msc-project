@@ -13,7 +13,7 @@ data_name = {'SE'};% choose the kernel function of synthetic data from:
 
 ratio_train = 0.6; % set the ratio of training set among the whole set.
 num_rep = 50; % set the amount of samples
-model_cov = {'SE'}; % 'SE'; 'Periodic'; 'Matern', '3'; 'Matern', '5', 'Exp', 'RQ' for single kernel
+model_cov = {'RQ'}; % 'SE'; 'Periodic'; 'Matern', '3'; 'Matern', '5', 'Exp', 'RQ' for single kernel
                                         % 'SE'; 'LIN'; 'Periodic' for 'sum'
                                         % and 'prod' mixing kernel
                                         % example: 'sum', 'SE', 'LIN' =

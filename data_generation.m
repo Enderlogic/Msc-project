@@ -17,7 +17,7 @@ function [x,data] = data_generation(hyp_data, num_data)
         covfunc_data = {@covSEiso};
         hyp.cov = log([hyp_data.lengthScale, sqrt(hyp_data.magnSigma2)]);
     elseif strcmp(hyp_data.data_name{1}, 'Matern')
-        covfunc_data = {'covMaterniso', str2double(data_name{2})};
+        covfunc_data = {'covMaterniso', str2double(hyp_data.data_name{2})};
         hyp.cov = log([hyp_data.lengthScale, sqrt(hyp_data.magnSigma2)]);
     elseif strcmp(hyp_data.data_name{1}, 'RQ')
         covfunc_data = {@covRQiso};

@@ -79,9 +79,9 @@ elseif strcmp(model_cov, 'Periodic')
     [xl, ~] = histnorm(sample_hyp.cf{1, 1}.lengthScale, 40, 'plot');
     hold on
     plot(pxl, max(xl) / max(pyl) * pyl, 'r')
-    vline(hyp_data.lengthScale, 'g', 'true value', 0.2)
-%     vline(prior.Periodic.lengthScale.mu, '--r', 'mean of prior', 0.2)
-%     vline(mean(sample_hyp.cf{1, 1}.lengthScale), '--', 'mean of posterior', 0.3)
+    vline(hyp_data.lengthScale, 'g', 'tr', 0.1)
+    vline(prior.Periodic.lengthScale.mu, '--r', 'mean of prior', 0.2)
+    vline(mean(sample_hyp.cf{1, 1}.lengthScale), '--', 'mean of posterior', 0.3)
 %     title(['Prior and posterior distribution of length scale in ' model_cov{1} ' kernel'])
 
     x_label = 'Length scale';
@@ -108,18 +108,11 @@ elseif strcmp(model_cov, 'Periodic')
     hold on
     plot(pxm, max(xm) / max(pym) * pym, 'r')
     vline(hyp_data.magnSigma2, 'g', 'true value', 0.1)
-%     vline(prior.Periodic.magnSigma2.mu, '--r', 'mean of prior', 0.2)
-%     vline(mean(sample_hyp.cf{1, 1}.magnSigma2), '--', 'mean of posterior', 0.3)
-%     title(['Prior and posterior distribution of magnitude in ' strjoin(model_cov) ' kernel'])
-
-    x_label = 'Magnitude';
-    y_label = 'Relative probability';
-    xlabel(x_label, 'FontSize',25, 'FontWeight','bold', 'Interpreter', 'latex')
-    ylabel(y_label, 'FontSize',25, 'FontWeight','bold', 'Interpreter', 'latex')
-    legend({'posterior', 'prior'}, 'FontSize',15, 'Interpreter', 'latex', 'Location', 'best')
-    legend boxoff
-    box off
-    set(findall(gca, 'Type', 'Line'),'LineWidth',2);
+    vline(prior.Periodic.magnSigma2.mu, '--r', 'mean of prior', 0.2)
+    vline(mean(sample_hyp.cf{1, 1}.magnSigma2), '--', 'mean of posterior', 0.3)
+    legend('posterior', 'prior')
+    title(['Prior and posterior distribution of magnitude in ' strjoin(model_cov) ' kernel'])
+    ylabel('Probability')
     
     % period
     if prior.Periodic.period.mu < min(sample_hyp.cf{1, 1}.period)
@@ -135,19 +128,12 @@ elseif strcmp(model_cov, 'Periodic')
     [xp, np] = histnorm(sample_hyp.cf{1, 1}.period, 200, 'plot');
     hold on
     plot(pxp, max(xp) / max(pyp) * pyp, 'r')
-    vline(hyp_data.period, 'g', 'true value', 0.4)
-%     vline(prior.Periodic.period.mu, '--r', 'mean of prior', 0.2)
-%     vline(mean(sample_hyp.cf{1, 1}.period), '--', 'mean of posterior', 0.3)
-%     title(['Prior and posterior distribution of period in ' model_cov{1} ' kernel'])
-    
-    x_label = 'Period';
-    y_label = 'Relative probability';
-    xlabel(x_label, 'FontSize',25, 'FontWeight','bold', 'Interpreter', 'latex')
-    ylabel(y_label, 'FontSize',25, 'FontWeight','bold', 'Interpreter', 'latex')
-    legend({'posterior', 'prior'}, 'FontSize',15, 'Interpreter', 'latex', 'Location', 'best')
-    legend boxoff
-    box off
-    set(findall(gca, 'Type', 'Line'),'LineWidth',2);
+    vline(hyp_data.period, 'g', 'true value', 0.1)
+    vline(prior.Periodic.period.mu, '--r', 'mean of prior', 0.2)
+    vline(mean(sample_hyp.cf{1, 1}.period), '--', 'mean of posterior', 0.3)
+    legend('posterior', 'prior')
+    title(['Prior and posterior distribution of period in ' model_cov{1} ' kernel'])
+    ylabel('Probability')
     
     % Sigma
     if prior.sigma2.mu < min(sample_hyp.lik.sigma2)
@@ -166,16 +152,9 @@ elseif strcmp(model_cov, 'Periodic')
     vline(hyp_data.sigma2, 'g', 'true value', 0.1)
     vline(prior.sigma2.mu, '--r', 'mean of prior', 0.2)
     vline(mean(sample_hyp.lik.sigma2), '--', 'mean of posterior', 0.3)
-%     title(['Prior and posterior distribution of ¦Ò when using ' strjoin(model_cov) ' kernel'])
-    
-    x_label = 'Noise $\sigma$';
-    y_label = 'Relative probability';
-    xlabel(x_label, 'FontSize',25, 'FontWeight','bold', 'Interpreter', 'latex')
-    ylabel(y_label, 'FontSize',25, 'FontWeight','bold', 'Interpreter', 'latex')
-    legend({'posterior', 'prior'}, 'FontSize',15, 'Interpreter', 'latex', 'Location', 'best')
-    legend boxoff
-    box off
-    set(findall(gca, 'Type', 'Line'),'LineWidth',2);
+    legend('posterior', 'prior')
+    title(['Prior and posterior distribution of ¦Ò when using ' strjoin(model_cov) ' kernel'])
+    ylabel('Probability')
 elseif strcmp(model_cov, 'Matern')
     % length scale
     if prior.Matern.lengthScale.mu < min(sample_hyp.cf{1, 1}.lengthScale)

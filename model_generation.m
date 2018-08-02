@@ -33,11 +33,11 @@ function [data_test, data_rep, sample_hyp, x_train, data_train, x_test, hyp_data
     disp('Data generation complete!')
     %% Compute MLE solution using gpml
     %initilise the hyperparameters for MLE
-    hyp_mle.SE.magnSigma2 = 20; %squared magnitude
+    hyp_mle.SE.magnSigma2 = 10; %squared magnitude
     hyp_mle.SE.lengthScale = 2;
-    hyp_mle.Periodic.magnSigma2 = 100; %squared magnitude
-    hyp_mle.Periodic.lengthScale = 10;
-    hyp_mle.Periodic.period = 1;
+    hyp_mle.Periodic.magnSigma2 = 10; %squared magnitude
+    hyp_mle.Periodic.lengthScale = 1;
+    hyp_mle.Periodic.period = 2;
     hyp_mle.Matern.magnSigma2 = 10;
     hyp_mle.Matern.lengthScale = 2;
     hyp_mle.Exp.magnSigma2 = 10;
