@@ -9,7 +9,7 @@ function [prior] = mle(hyp_mle, x, data, model_cov)
     % x: the training input location
     % data: the training data
 
-%     [x, ~, ~]  = zscore(x);
+    [x, ~, ~]  = zscore(x);
 
     likfunc = @likGauss;
     meanfunc = @meanConst;

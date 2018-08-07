@@ -1,14 +1,14 @@
 % Random seed for controlled experiment
-for C = 1:100
+for C = 1:1
     
     rng(C)
     % Generate X's
     n = 500; X = sort(10 * rand(n, 1));
     
     % True model (choose a kernel)
-    % covfunc = {@covSEiso};
-    covfunc = {@covMaterniso, 1};
-    % covfunc = {@covMaterniso, 5};
+    covfunc = {@covSEiso};
+%     covfunc = {@covMaterniso, 1};
+%     covfunc = {@covMaterniso, 5};
     
     % Set parameters
     sigma = 1; noiseVariance = 0.001^2; signalVariance = 1;    
@@ -21,7 +21,7 @@ for C = 1:100
     y = mvnrnd(zeros(n, 1), K); y = y(:);
     
     % Gaussian process regression
-    [YPred, param] = GPWrapper_MC(X, y(:), X);
+    [YPred, param] = GPWrapper(X, y(:), X);
     covfunc = param.covfunc;
     hyp = param.hyp;
     
@@ -32,7 +32,7 @@ for C = 1:100
     
     % Generate replicate sample(s) from fitted model
     Ktmp = feval(covfunc{:}, hyp.cov, X);
-    K = 0.5 * (Ktmp + Ktmp') + eye(n) * (noiseVariance);
+    K = 0.5 * (Ktmp + Ktmp') + eye(n) * (exp(hyp.lik)^2);
     
     nRep = 1;
     y_rep = zeros(n, nRep);

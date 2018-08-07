@@ -36,7 +36,7 @@ function [data_test, data_rep, sample_hyp, x_train, data_train, x_test, hyp_data
     hyp_mle.SE.magnSigma2 = 10; %squared magnitude
     hyp_mle.SE.lengthScale = 1;
     hyp_mle.Periodic.magnSigma2 = 10; %squared magnitude
-    hyp_mle.Periodic.lengthScale = 3;
+    hyp_mle.Periodic.lengthScale = 1;
     hyp_mle.Periodic.period = 2;
     hyp_mle.Matern.magnSigma2 = 1;
     hyp_mle.Matern.lengthScale = 1;

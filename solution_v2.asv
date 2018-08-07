@@ -2,7 +2,7 @@ clear
 close all 
 %% Setting for data, model and PPC
 option_data = 'syn'; % choose synthetic data (syn) or real data (real)
-data_name = {'SE'};% choose the kernel function of synthetic data from:
+data_name = {'Periodic'};% choose the kernel function of synthetic data from:
                             % Matern kernel ('Matern', '3'; 'Matern', '5')
                             % SE kernel (SE)
                             % Periodic kernel (Periodic)
@@ -12,8 +12,8 @@ data_name = {'SE'};% choose the kernel function of synthetic data from:
 % model_cov = {'Matern', '3'};
 
 ratio_train = 0.6; % set the ratio of training set among the whole set.
-num_rep = 50; % set the amount of samples
-model_cov = {'Exp'}; % 'SE'; 'Periodic'; 'Matern', '3'; 'Matern', '5', 'Exp', 'RQ' for single kernel
+num_rep = 200; % set the amount of samples
+model_cov = {'Periodic'}; % 'SE'; 'Periodic'; 'Matern', '3'; 'Matern', '5', 'Exp', 'RQ' for single kernel
                                         % 'SE'; 'LIN'; 'Periodic' for 'sum'
                                         % and 'prod' mixing kernel
                                         % example: 'sum', 'SE', 'LIN' =

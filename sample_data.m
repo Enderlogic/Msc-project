@@ -54,7 +54,7 @@ function [data_rep] = sample_data(sample_hyp, model_cov, sample_location, sample
         else
             error('The type of covariance function is invalid')
         end
-        mu = zeros(1, num_data); % assume using zero mean function, more non-zero mean functions will be finished later
+        mu = mean(data_train) * ones(num_data, 1); % assume using zero mean function, more non-zero mean functions will be finished later
         for i = 1 : num_rep
             if strcmp(sample_location, 'test')
                 K = feval(covfunc{:}, hyp.cov(:,i), x_test);
@@ -64,8 +64,7 @@ function [data_rep] = sample_data(sample_hyp, model_cov, sample_location, sample
                 error('The type of sample location is invalid!')
             end
             K = (K + K') / 2;
-            data_rep.para(:, i) = mvnrnd(mu, K)';
-            data_rep.para(:, i) = mvnrnd(data_rep.para(:, i), sample_hyp.lik.sigma2(i) * eye(num_data));
+            data_rep.para(:, i) = mvnrnd(mu, K + sample_hyp.lik.sigma2(i) * eye(num_data))';
         end
     end
     if strcmp(sample_type, 'para&obs') || strcmp(sample_type, 'both')

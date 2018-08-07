@@ -19,9 +19,10 @@ function [p_value] = p_value_calculator(data_test, data_rep, criteria, model_cov
             error('MMD test could only be applied on p(y_rep|para, y_obs). Please use para&obs or both as sample_type')
         end
         elseif strcmp(criteria, 'chi_square')
-            p_value_temp = zeros(size(data_rep, 2), 1);
             if isfield(data_rep, 'para')
-                cri_data.para = zeros(size(data_rep, 2), 1);
+                cri_data.para = zeros(size(data_rep.para, 2), 1);
+                p_value_temp = zeros(size(data_rep.para, 2), 1);
+                pvalList = zeros(size(data_rep.para, 2), 1);
 %                 cri_rep.para = zeros(size(data_rep, 2), 1);
                 if strcmp(model_cov{1}, 'sum') || strcmp(model_cov{1}, 'prod')
                     hyp.cov = [];
@@ -69,13 +70,15 @@ function [p_value] = p_value_calculator(data_test, data_rep, criteria, model_cov
                         K = (K + K') / 2;
                         K = K + sample_hyp.lik.sigma2(i) * eye(size(x_test, 1));
                         cri_data.para(i) = data_test' / K * data_test;
-                        p_value_temp(i) = 1 - chi2cdf(cri_data.para(i), size(x_test, 1));
+                        p_value_temp(i) = 1 - chi2cdf(cri_data.para(i), size(x_test, 1) - 1);
+                        [U, S] = eig(K); 
+                        [~, pvalList(i)] = lbqtest(diag(diag(S).^-0.5) * U' * data_test);
                     elseif strcmp(sample_location, 'train')
                         K = feval(covfunc{:}, hyp.cov(:,i), x_train);
                         K = (K + K') / 2;
                         K = K + sample_hyp.lik.sigma2(i) * eye(size(x_train, 1));
                         cri_data.para(i) = data_train' / K * data_train;
-                        p_value_temp(i) = 1 - chi2cdf(cri_data.para(i), size(x_train, 1));
+                        p_value_temp(i) = 1 - chi2cdf(cri_data.para(i), size(x_train, 1) - 1);
                     else
                         error('The type of sample location is invalid!')
                     end
@@ -83,6 +86,7 @@ function [p_value] = p_value_calculator(data_test, data_rep, criteria, model_cov
                 end
                 p_value.para = mean(p_value_temp);
                 disp(['p-value for p(y^rep|para) is: ', num2str(p_value.para)])
+%                 disp(['p-value for p(y^rep|para) is: ', num2str(p_value.para), num2str(mean(pvalList))])
             end
             if isfield(data_rep, 'para_obs')
                 for i = 1 : size(data_rep.para_obs, 2)
